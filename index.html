@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorting Algorithm Visualizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #2c3e50;
+      color: white;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    #bars-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      height: 300px;
+      margin: 20px auto;
+      border: 1px solid #ecf0f1;
+      background-color: #ecf0f1;
+      width: 90%;
+      overflow: hidden;
+    }
+    .bar {
+      margin: 0 2px;
+      background-color: #3498db;
+      width: 20px;
+      transition: height 0.1s, background-color 0.1s;
+    }
+    .controls {
+      margin: 20px;
+    }
+    button, select {
+      margin: 5px;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    select {
+      background-color: white;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sorting Algorithm Visualizer</h1>
+  <div class="controls">
+    <button onclick="generateBars()">Generate Bars</button>
+    <select id="algorithm">
+      <option value="bubble">Bubble Sort</option>
+      <option value="selection">Selection Sort</option>
+      <option value="insertion">Insertion Sort</option>
+    </select>
+    <button onclick="sortBars()">Sort</button>
+  </div>
+  <div id="bars-container"></div>
+
+  <script>
+    const barsContainer = document.getElementById('bars-container');
+    let data = [];
+
+    // Generate random bars
+    function generateBars() {
+      barsContainer.innerHTML = ''; // Clear existing bars
+      data = Array.from({ length: 30 }, () => Math.floor(Math.random() * 250) + 50); // Random heights
+      data.forEach(height => {
+        const bar = document.createElement('div');
+        bar.style.height = `${height}px`;
+        bar.classList.add('bar');
+        barsContainer.appendChild(bar);
+      });
+    }
+
+    // Delay function for visualization
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Sorting function
+    async function sortBars() {
+      const algorithm = document.getElementById('algorithm').value;
+      if (algorithm === 'bubble') await bubbleSort();
+      else if (algorithm === 'selection') await selectionSort();
+      else if (algorithm === 'insertion') await insertionSort();
+    }
+
+    // Bubble Sort
+    async function bubbleSort() {
+      const bars = document.querySelectorAll('.bar');
+      for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < data.length - i - 1; j++) {
+          bars[j].style.backgroundColor = 'red';
+          bars[j + 1].style.backgroundColor = 'red';
+          if (data[j] > data[j + 1]) {
+            [data[j], data[j + 1]] = [data[j + 1], data[j]];
+            bars[j].style.height = `${data[j]}px`;
+            bars[j + 1].style.height = `${data[j + 1]}px`;
+          }
+          await delay(50);
+          bars[j].style.backgroundColor = '#3498db';
+          bars[j + 1].style.backgroundColor = '#3498db';
+        }
+        bars[data.length - i - 1].style.backgroundColor = 'green';
+      }
+    }
+
+    // Selection Sort
+    async function selectionSort() {
+      const bars = document.querySelectorAll('.bar');
+      for (let i = 0; i < data.length; i++) {
+        let minIdx = i;
+        bars[minIdx].style.backgroundColor = 'red';
+        for (let j = i + 1; j < data.length; j++) {
+          bars[j].style.backgroundColor = 'yellow';
+          if (data[j] < data[minIdx]) {
+            bars[minIdx].style.backgroundColor = '#3498db';
+            minIdx = j;
+            bars[minIdx].style.backgroundColor = 'red';
+          }
+          await delay(50);
+          bars[j].style.backgroundColor = '#3498db';
+        }
+        [data[i], data[minIdx]] = [data[minIdx], data[i]];
+        bars[i].style.height = `${data[i]}px`;
+        bars[minIdx].style.height = `${data[minIdx]}px`;
+        bars[minIdx].style.backgroundColor = '#3498db';
+        bars[i].style.backgroundColor = 'green';
+      }
+    }
+
+    // Insertion Sort
+    async function insertionSort() {
+      const bars = document.querySelectorAll('.bar');
+      for (let i = 1; i < data.length; i++) {
+        let key = data[i];
+        let j = i - 1;
+        bars[i].style.backgroundColor = 'red';
+        while (j >= 0 && data[j] > key) {
+          data[j + 1] = data[j];
+          bars[j + 1].style.height = `${data[j]}px`;
+          bars[j].style.backgroundColor = 'yellow';
+          await delay(50);
+          bars[j].style.backgroundColor = '#3498db';
+          j--;
+        }
+        data[j + 1] = key;
+        bars[j + 1].style.height = `${key}px`;
+        bars[i].style.backgroundColor = 'green';
+      }
+    }
+
+    // Initialize with bars
+    generateBars();
+  </script>
+</body>
+</html>
